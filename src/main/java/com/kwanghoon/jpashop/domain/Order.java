@@ -1,9 +1,5 @@
 package com.kwanghoon.jpashop.domain;
 
-import com.kwanghoon.jpashop.domain.Delivery;
-import com.kwanghoon.jpashop.domain.Member;
-import com.kwanghoon.jpashop.domain.OrderItem;
-import com.kwanghoon.jpashop.domain.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +7,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static javax.persistence.CascadeType.*;
+import static javax.persistence.FetchType.*;
 
 @Entity
 @Table(name = "orders")
@@ -20,14 +19,14 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = LAZY, cascade = ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
@@ -36,4 +35,20 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status; // 주문상태
 
+
+    /* 연관관계 메서드 (양방향) */                   // public static void main(String[] args) {
+    public void setMember(Member member) {     //   Member member = new Member();
+        this.member = member;                  //   Order order = new Order();
+        member.getOrders().add(this);          //   member.getOrders().add(order);
+    }                                          //   order.setMember(member);
+                                               // }
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
+
+    public void setDelivery(Delivery delivery) {
+        this.delivery = delivery;
+        delivery.setOrder(this);
+    }
 }
