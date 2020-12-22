@@ -1,12 +1,13 @@
 package com.kwanghoon.jpashop.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static javax.persistence.CascadeType.*;
@@ -15,6 +16,7 @@ import static javax.persistence.FetchType.*;
 @Entity
 @Table(name = "orders")
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
     @Id @GeneratedValue
     @Column(name = "order_id")
@@ -76,7 +78,7 @@ public class Order {
         }
 
         this.setStatus(OrderStatus.CANCEL);
-        orderItems.forEach(OrderItem::canccel);
+        orderItems.forEach(OrderItem::cancel);
     }
 
     public int getTotalPrice() {

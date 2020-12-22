@@ -1,7 +1,9 @@
 package com.kwanghoon.jpashop.domain;
 
 import com.kwanghoon.jpashop.domain.item.Item;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -10,6 +12,7 @@ import static javax.persistence.FetchType.*;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
     @Id @GeneratedValue
     @Column(name = "order_item_id")
@@ -39,7 +42,7 @@ public class OrderItem {
     }
 
     /* 비즈니스 로직 */
-    public void canccel() {
+    public void cancel() {
         getItem().addStock(count);
     }
 
