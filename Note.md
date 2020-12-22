@@ -17,3 +17,16 @@
 - repository: JPA를 직접 사용하는 계층, 엔티티 매니저 사용
 - domain: 엔티티가 모여 있는 계층, 모든 계층에서 사용
 
+#### Injection
+- 필드 주입
+  - @Autowired </br>
+    MemberRepository memberRepository
+- 생성자 주입
+    - private final MemberRepository memberRepository </br>
+      public MemberService(MemberRepository memberRepositroy) { this.memberRepositroy = memberRepository }
+      
+    - 생성자 주입을 권징
+    - 변경 불가능한 안전한 객체 생성 가능
+    - 생성자가 하나면, @Autowired를 생략할 수 있다.
+    - final 키워드를 추가하면 컴파일 시점에 memberRepositroy를 설정하지 않는 오류를 체크할 수 있다. (보통 기본 생성자를 추가할 때 발견)
+    
