@@ -1,6 +1,8 @@
 #### 단축키
 - command + shift + f: 파일내에서 찾기
 - option + enter: static import(add)
+- command + option + P: 변수 파라미터로 꺼낼 수 있음
+- option + command + M: 함수로 빼기
 
 #### FK
 - 데이터 정합성이 중요하면 사용 ex) 결제(돈)
