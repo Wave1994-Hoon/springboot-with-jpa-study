@@ -1,5 +1,6 @@
 package com.kwanghoon.jpashop.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kwanghoon.jpashop.domain.item.Item;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class OrderItem {
     @JoinColumn(name = "item_id")
     private Item item;
 
+    @JsonIgnore
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
