@@ -111,7 +111,6 @@ public class MemberApiController {
     }
 
     @Data
-
     static class CreateMemberResponse {
         private Long id;
 
