@@ -65,10 +65,28 @@ public class OrderSimpleApiController {
     public List<SimpleOrderDto> orderV2() {
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
 
-        return orders.stream()
+        return orders
+            .stream()
             .map(SimpleOrderDto::new)
             .collect(Collectors.toList());
     }
+
+    /*
+    * V3
+    * 페치조인으로 최적화
+    * 엔티티를 페치 조인을 사용하여 쿼리 한 번에 조회
+    */
+    @GetMapping("/api/v3/simple-orders")
+    public List<SimpleOrderDto> orderV3() {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery();
+
+        return orders
+            .stream()
+            .map(SimpleOrderDto::new)
+            .collect(Collectors.toList());
+
+    }
+
 
     @Data
     static class SimpleOrderDto {
