@@ -1,4 +1,6 @@
-package com.kwanghoon.jpashop.domain;
+package com.kwanghoon.jpashop.repository;
+
+import com.kwanghoon.jpashop.domain.OrderStatus;
 
 public class OrderSearch {
     private String memberName; //회원 이름

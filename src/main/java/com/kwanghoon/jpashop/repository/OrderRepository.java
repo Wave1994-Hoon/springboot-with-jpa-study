@@ -1,7 +1,6 @@
 package com.kwanghoon.jpashop.repository;
 
 import com.kwanghoon.jpashop.domain.Order;
-import com.kwanghoon.jpashop.domain.OrderSearch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
