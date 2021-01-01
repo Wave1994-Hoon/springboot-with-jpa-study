@@ -55,6 +55,25 @@ public class OrderApiController {
             .collect(Collectors.toList());
     }
 
+    /*
+     * V3
+     * 페치 조인을 사용 해서 성능 최적화
+     * distinct를 사용하여 중복 row 제거 (1:N inner join 시 중복 row 발생)
+     *
+     * 단점
+     * Collection을 페치 조인할 경우 페이징은 사용 불가능
+     * 엄밀하게는 페이징 기능은 수행은 되지만 DB에서 수행하지 않고 어플리케이션 메모리로 수행
+     */
+    @GetMapping("/api/v3/orders")
+    public List<OrderDto> orderV3() {
+        List<Order> orders = orderRepository.findAllWithItem();
+
+        return orders
+            .stream()
+            .map(OrderDto::new)
+            .collect(Collectors.toList());
+    }
+
     @Data
     static class OrderDto {
         private Long orderId;
