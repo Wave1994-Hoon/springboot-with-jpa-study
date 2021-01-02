@@ -43,3 +43,9 @@
 - 반대로 엔티티에는 비즈니스 로직이 거의 없고 서비스 계층에서 대부분의 비즈니스 로직을 처리하는 것을 트랜잭션 스크립트 패턴이라고함 
     - SQL을 사용했을 때 많이 사용했던 패턴 
     
+
+#### DTO, Fetch join
+- error log 
+    - query specified join fetching, but the owner of the fetched association was not present in the select list 
+    - 이유: fetch join을 사용하는 이유는 엔티티 상태에서 엔티티 그래프를 참조하기 위해서 사용하는 것입니다. 따라서 당연히 엔티티가 아닌 DTO 상태로 조회하는 것은 불가능합니다.
+    
