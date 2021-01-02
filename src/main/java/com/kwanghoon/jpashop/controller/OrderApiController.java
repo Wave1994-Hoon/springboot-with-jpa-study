@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -67,6 +68,29 @@ public class OrderApiController {
     @GetMapping("/api/v3/orders")
     public List<OrderDto> orderV3() {
         List<Order> orders = orderRepository.findAllWithItem();
+
+        return orders
+            .stream()
+            .map(OrderDto::new)
+            .collect(Collectors.toList());
+    }
+
+    /*
+    * V3.1
+    * 페치 조인(xToOne) + batch_size(xToMany)
+    * batch_size 설정을 하면 xToOne도 fetch join 생략 가능, 단 쿼리는 추가 발생
+    *
+    * 장점
+    * N+1 --> 1+1 로 최적화
+    * xToMany는 fetch join을 사용하지 않기 때문에 데이터 뻥튀기 x --> DB 에서 애플리케이션으로 전송하는 데이터량 감소
+    * 페이징이 가능하다 !!!
+    */
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> orderV3_page(
+        @RequestParam(value = "offset", defaultValue = "0") int offset,
+        @RequestParam(value = "limit", defaultValue = "100") int limit
+    ) {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
 
         return orders
             .stream()
