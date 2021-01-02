@@ -6,6 +6,8 @@ import com.kwanghoon.jpashop.domain.OrderItem;
 import com.kwanghoon.jpashop.domain.OrderStatus;
 import com.kwanghoon.jpashop.repository.OrderRepository;
 import com.kwanghoon.jpashop.repository.OrderSearch;
+import com.kwanghoon.jpashop.repository.order.query.OrderFlatDto;
+import com.kwanghoon.jpashop.repository.order.query.OrderItemQueryDto;
 import com.kwanghoon.jpashop.repository.order.query.OrderQueryDto;
 import com.kwanghoon.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Data;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,7 +60,7 @@ public class OrderApiController {
         return orders
             .stream()
             .map(OrderDto::new)
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     /*
@@ -75,7 +79,7 @@ public class OrderApiController {
         return orders
             .stream()
             .map(OrderDto::new)
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     /*
@@ -98,18 +102,68 @@ public class OrderApiController {
         return orders
             .stream()
             .map(OrderDto::new)
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     /*
     * V4
+    * JPA에서 DTO로 바로 조회, 컬렉션 N 조회 (1+NQuery)
+    *
+    * 장점
     * Query: 루트 1번, 컬렉션 N번 실행
     * ToOne 관계들을 먼저 조회, ToMany 관계는 각각 별도로 처리 (조안 시, row 수 증가하기 때문)
     * row 수가 증가하지 않는 ToOne 관계는 조인으로 최적화 하기 쉬우므로 한번에 조히하고, ToMany는 별도 메서드로 조회
+    * 데이터 select 양 감소
+    *
+    * 단점
+    * 쿼리수 증가 (N + 1)
     */
     @GetMapping("/api/v4/orders")
     public List<OrderQueryDto> orderV4(){
         return orderQueryRepository.findOrderQueryDtos();
+    }
+
+    /*
+    * V5
+    * JPA에서 DTO로 바로 조회, 컬렉션 1 조회 최적화 버전 (1+1Query)
+    *
+    * 장점
+    * Query: 루트 1번, 컬렉션 1번
+    * ToOne 관계들을 먼저 조회하고, 여기서 얻은 식별자 orderId로 ToMany 관계인 OrderItem을 한꺼번에 조회
+    * Map을 사용해서 매칭 성능 향상: O(1)
+    * 데이터 select 양 감소
+    *
+    * 단점
+    * 쿼리 수 증가 (1 + 1)
+    */
+    @GetMapping("/api/v5/orders")
+    public List<OrderQueryDto> orderV5(){
+        return orderQueryRepository.findAllByDto_optimization();
+    }
+
+    /*
+    * V6
+    * JPA에서 DTO로 바로 조회, 플랫 데이터
+    *
+    * 장점
+    * Query: 1번
+    *
+    * 단점
+    * 쿼리는 한 번 이지만 조인으로 인해 DB에서 애플리케이션에 전달하는 데이터에 중복 데이터가 추가되므로 상황에 따라 V5보다 더 느릴 수 있다.
+    * 애플리케이션에서 추가 작업이 크다.
+    * 페이징 불가
+    */
+    @GetMapping("/api/v6/orders")
+    public List<OrderQueryDto> orderV6(){
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
+
+
+        return flats.stream()
+            .collect(groupingBy(o -> new OrderQueryDto(o.getOrderId(),
+                    o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()), mapping(o -> new OrderItemQueryDto(o.getOrderId(),
+                o.getItemName(), o.getOrderPrice(), o.getCount()), toList()))).entrySet().stream()
+            .map(e -> new OrderQueryDto(e.getKey().getOrderId(), e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(), e.getKey().getAddress(), e.getValue()))
+            .collect(toList());
     }
 
     @Data
@@ -132,7 +186,7 @@ public class OrderApiController {
                 .getOrderItems()
                 .stream()
                 .map(OrderItemDto::new)
-                .collect(Collectors.toList());;
+                .collect(toList());;
 
         }
     }
