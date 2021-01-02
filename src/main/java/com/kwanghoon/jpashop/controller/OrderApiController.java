@@ -6,6 +6,8 @@ import com.kwanghoon.jpashop.domain.OrderItem;
 import com.kwanghoon.jpashop.domain.OrderStatus;
 import com.kwanghoon.jpashop.repository.OrderRepository;
 import com.kwanghoon.jpashop.repository.OrderSearch;
+import com.kwanghoon.jpashop.repository.order.query.OrderQueryDto;
+import com.kwanghoon.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     /*
     * V1
@@ -96,6 +99,17 @@ public class OrderApiController {
             .stream()
             .map(OrderDto::new)
             .collect(Collectors.toList());
+    }
+
+    /*
+    * V4
+    * Query: 루트 1번, 컬렉션 N번 실행
+    * ToOne 관계들을 먼저 조회, ToMany 관계는 각각 별도로 처리 (조안 시, row 수 증가하기 때문)
+    * row 수가 증가하지 않는 ToOne 관계는 조인으로 최적화 하기 쉬우므로 한번에 조히하고, ToMany는 별도 메서드로 조회
+    */
+    @GetMapping("/api/v4/orders")
+    public List<OrderQueryDto> orderV4(){
+        return orderQueryRepository.findOrderQueryDtos();
     }
 
     @Data
